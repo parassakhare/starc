@@ -1,0 +1,79 @@
+<mujoco model="starc_scene">
+  <!--
+    STARC simulation scene — SO-ARM101 with wrist + overhead cameras.
+
+    Robot:   SO-ARM101 (6 DOF + gripper, STS3215 servos)
+    Cameras: wrist_cam    — attached to gripper (defined in so101.xml)
+             overhead_cam — fixed overhead, top-down view of workspace
+
+    The arm base is at world origin (z=0). A workspace mat is placed at z=0.
+    The red cube target sits on the floor within arm reach at ~(0.18, 0, 0).
+  -->
+
+  <!-- Merge the full SO-ARM101 model (assets + worldbody + actuators) -->
+  <include file="../mujoco_menagerie/robotstudio_so101/so101.xml"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="160" elevation="-20"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0"
+             width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge"
+             rgb1="0.25 0.25 0.25" rgb2="0.15 0.15 0.15"
+             markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" texture="groundplane" texuniform="true"
+              texrepeat="5 5" reflectance="0.1"/>
+    <material name="workspace_mat" rgba="0.75 0.65 0.50 1"/>
+    <material name="cube_red" rgba="0.8 0.1 0.1 1"/>
+  </asset>
+
+  <worldbody>
+    <!-- Lights -->
+    <light name="main_light" pos="0.4 0 1.8" dir="0 0 -1"
+           directional="true" diffuse="0.8 0.8 0.8" specular="0.2 0.2 0.2"/>
+    <light name="fill_light" pos="-0.4 0.5 1.2" dir="0.3 -0.3 -0.7"
+           directional="true" diffuse="0.3 0.3 0.3" specular="0 0 0"/>
+
+    <!-- Floor -->
+    <geom name="floor" size="0 0 0.05" pos="0 0 0" type="plane"
+          material="groundplane"/>
+
+    <!-- Workspace mat: thin slab showing the working area in front of the arm -->
+    <geom name="workspace_mat" type="box" size="0.22 0.20 0.002"
+          pos="0.18 0 0.002" material="workspace_mat"/>
+
+    <!--
+      Red cube target: 4 cm cube, placed within arm reach.
+      pos=(0.18, 0, 0.02) puts it on the floor, 18 cm in front of arm base.
+      freejoint allows physics to move it.
+    -->
+    <body name="cube" pos="0.18 0 0.022">
+      <freejoint name="cube_joint"/>
+      <geom name="cube_geom" type="box" size="0.02 0.02 0.02"
+            material="cube_red" mass="0.05" friction="0.8 0.005 0.0001"
+            condim="4"/>
+    </body>
+
+    <!--
+      Overhead camera: fixed in world, 1.0 m above workspace, looking straight down.
+      xyaxes="1 0 0 0 1 0" → camera X=world X, camera Y=world Y,
+      so camera Z (optical axis) points in -world Z = downward. Wait, that points UP.
+
+      In MuJoCo camera convention:
+        - camera looks in the -Z direction of its own frame
+        - xyaxes defines the camera's X and Y axes in world coordinates
+      So xyaxes="1 0 0 0 1 0" means camX=worldX, camY=worldY, camZ=worldX×worldY=worldZ
+      The camera looks in -camZ = -worldZ = downward. Correct!
+    -->
+    <camera name="overhead_cam" mode="fixed"
+            pos="0.18 0 1.0"
+            xyaxes="1 0 0 0 1 0"
+            resolution="640 480"
+            fovy="60"/>
+  </worldbody>
+
+</mujoco>

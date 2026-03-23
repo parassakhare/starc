@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[oc]
+*.pyo
+build/
+dist/
+wheels/
+*.egg-info/
+.eggs/
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# uv / pip
+.uv/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Type checking
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# MuJoCo rendered outputs / training artifacts
+outputs/
+data/
+*.mjb
+*.png
+*.ppm
+
+# Training checkpoints (large)
+checkpoints/
+wandb/
+
+# External repos (cloned separately, not submodules)
+mujoco_menagerie/
+
+# Secrets / env
+.env
+.env.*
+*.pem
+*.key
+
+# Claude Code local files
+.claude/
