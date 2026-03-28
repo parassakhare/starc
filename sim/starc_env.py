@@ -49,11 +49,13 @@ class StarcCubeTransferEnv(gym.Env):
         render_mode: str | None = "rgb_array",
         max_episode_steps: int = 500,
         cube_pos_noise: float = 0.02,
+        frame_skip: int = 4,
     ):
         super().__init__()
         self.render_mode = render_mode
         self.max_episode_steps = max_episode_steps
         self.cube_pos_noise = cube_pos_noise
+        self.frame_skip = frame_skip
 
         self.model = mujoco.MjModel.from_xml_path(str(_SCENE_XML))
         self.data = mujoco.MjData(self.model)
@@ -102,7 +104,8 @@ class StarcCubeTransferEnv(gym.Env):
     def step(self, action: np.ndarray):
         action = np.clip(action, -1.0, 1.0).astype(np.float32)
         self.data.ctrl[:] = _denormalize(action)
-        mujoco.mj_step(self.model, self.data)
+        for _ in range(self.frame_skip):
+            mujoco.mj_step(self.model, self.data)
         self._step_count += 1
 
         obs = self._get_obs()

@@ -6,7 +6,8 @@
     Cameras: wrist_cam    — attached to gripper (defined in so101.xml)
              overhead_cam — fixed overhead, top-down view of workspace
 
-    The arm base is at world origin (z=0). A workspace mat is placed at z=0.
+    The arm base is elevated (z=0.25) and tilted 40° forward so the gripper
+    can reach down to the workspace. A workspace mat is at z=0.
     The red cube target sits on the floor within arm reach at ~(0.18, 0, 0).
   -->
 
